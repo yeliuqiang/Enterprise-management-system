@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- 定义dbcp数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<!-- 指定JDBC驱动类 -->
+		<property name="driverClassName" value="com.mysql.jdbc.Driver">
+		</property>
+		<!-- 提供连接数据库的URL地址 -->
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/easybuy">
+		</property>
+		<!-- 提供连接数据库的用户名和密码 -->
+		<property name="username" value="root"></property>
+		<property name="password" value="xyz1994625"></property>
+	</bean>
+	<!-- 定义SessionFactory Bean -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<!-- 为LocalSessionFactoryBean注入定义好的数据源 -->
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<!-- 添加Hibernate配置参数 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+		<!-- 添加对象关系映射文件 -->
+		<property name="mappingResources">
+			<list>
+				<value>entity/project.hbm.xml</value>
+				<value>entity/workorder.hbm.xml</value>
+				
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="workorderDao" class="dao.impl.WorkorderDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="projectDao" class="dao.impl.ProjectDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="workorderService" class="service.impl.WorkorderServiceImpl">
+		<property name="workorderDao" ref="workorderDao"/>
+	</bean>
+	<bean id="projectService" class="service.impl.ProjectServiceImpl">
+		<property name="projectDao" ref="projectDao"/>
+	</bean>
+	<bean id="workorderAction" class="action.WorkorderAction">
+		<property name="workorderService" ref="workorderService"/>
+		<property name="projectService" ref="projectService"/>
+	</bean>
+
+</beans>
